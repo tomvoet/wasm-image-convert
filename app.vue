@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import init, { greet } from "./wasm/pkg/wasm"
 
+const isDark = useState<boolean>("dark")
+
 const test = async () => {
 
   await init()
@@ -10,7 +12,11 @@ const test = async () => {
 </script>
 
 <template>
-  <div>
-    <button @click="test">test</button>
+  <div class="bg-white dark:bg-gray-900 h-screen p-3">
+    <HeaderBar />
+    <Hero />
+    <div class="w-96">
+      <Converter />
+    </div>
   </div>
 </template>

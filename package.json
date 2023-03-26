@@ -7,10 +7,12 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "deploy": "nuxt generate && gh-pages -d ./dist -t true",
+    "wasm:bundle": "cd wasm && wasm-pack build --target web",
+    "deploy": "pnpm run wasm:bundle && cd .. && nuxt generate && gh-pages -d ./dist -t true",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.6.4",
     "@vueuse/nuxt": "^9.13.0",
     "gh-pages": "^5.0.0",
     "husky": "^8.0.3",
