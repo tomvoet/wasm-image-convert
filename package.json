@@ -8,7 +8,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "wasm:bundle": "cd wasm && wasm-pack build --target web",
-    "deploy": "pnpm run wasm:bundle && cd .. && nuxt generate && gh-pages -d ./dist -t true",
+    "deploy": "pnpm run wasm:bundle && nuxt generate && gh-pages -d ./dist -t true",
     "prepare": "husky install"
   },
   "devDependencies": {
