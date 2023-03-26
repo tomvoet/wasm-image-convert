@@ -1,0 +1,17 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "deploy": "nuxt generate && gh-pages -d ./dist -t true"
+  },
+  "devDependencies": {
+    "@vueuse/nuxt": "^9.13.0",
+    "gh-pages": "^5.0.0",
+    "nuxt": "^3.3.2"
+  }
+}
