@@ -1,42 +1,9 @@
-# Nuxt 3 Minimal Starter
+# Wasm-Convert
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+[![pages-build-deployment](https://github.com/tomvoet/wasm-convert/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/tomvoet/wasm-convert/actions/workflows/pages/pages-build-deployment)
 
-## Setup
+Introducing the **WASM File Converter App**! 
 
-Make sure to install the dependencies:
+This app is designed to convert different file formats and it's free and easy to use. The app is also very fast and private due to client-side conversions using WebAssembly (WASM). 
 
-```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
-# pnpm
-pnpm install
-```
-
-## Development Server
-
-Start the development server on http://localhost:3000
-
-```bash
-npm run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+**Try it out today!🚀**
