@@ -6,20 +6,8 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
-    pub fn alert(s: &str);
-
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
-
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-}
-
-#[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert(&format!("Hello, {}!", name));
-
-    log(&format!("Hello, {}!", name));
 }
 
 enum FileType {
@@ -76,14 +64,21 @@ impl FileType {
 }
 
 #[wasm_bindgen]
-pub fn convert_image(file: &Uint8Array, src_type: &str, target_type: &str) -> Uint8Array {
+pub fn convert_image(
+    file: &Uint8Array,
+    src_type: &str,
+    target_type: &str,
+    /*cb: &js_sys::Function, */
+) -> Uint8Array {
     let file = file.to_vec();
 
-    let src_type = FileType::from_mime_type(src_type)
-        .unwrap()
-        .to_image_format();
-
-    let load = image::load_from_memory_with_format(&file, src_type);
+    let load = match FileType::from_mime_type(src_type) {
+        Some(file_type) => image::load_from_memory_with_format(&file, file_type.to_image_format()),
+        None => {
+            log("Unknown source type");
+            image::load_from_memory(&file)
+        }
+    };
 
     let img = load.unwrap();
 
@@ -95,9 +90,15 @@ pub fn convert_image(file: &Uint8Array, src_type: &str, target_type: &str) -> Ui
 
     let mut output: Vec<u8> = Vec::new();
 
-    let target_type = FileType::from_mime_type(target_type)
-        .unwrap()
-        .to_image_output_format();
+    //let this = JsValue::null();
+    ////cb.call1(&this, &JsValue::from_str(String::new("Hallooo")));
+    //cb.call1(&this, &JsValue::from_str(&("testtaaaa".to_owned())))
+    //    .unwrap();
+
+    let target_type = match FileType::from_mime_type(target_type) {
+        Some(file_type) => file_type.to_image_output_format(),
+        None => FileType::PNG.to_image_output_format(),
+    };
 
     img.write_to(&mut Cursor::new(&mut output), target_type)
         .unwrap();

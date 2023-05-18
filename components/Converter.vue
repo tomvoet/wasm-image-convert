@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import init, { greet, convert_image } from "@/wasm/pkg/wasm"
+import MyWorker from "@/workers/convert.ts?worker"
+//https://github.com/eliaSchenker/nuxt-webworker/blob/main/plugins/sw.ts
 
 const file = ref<File | null>(null)
 
@@ -15,28 +16,54 @@ const fileEndings = {
 
 const outputType = ref("image/jpeg" as keyof typeof fileEndings)
 
-watchEffect(() => {
-    console.log(file.value)
-})
-
-const convert = async () => {
+const startConversion = async () => {
     if (file.value) {
-        await init()
-
         const reader = new FileReader()
-        reader.onloadend = e => {
+
+        reader.onloadend = async e => {
             const res = e.target?.result as ArrayBuffer
 
             const arr = new Uint8Array(res)
 
-            const result = convert_image(arr, file.value?.type || "image/png", outputType.value)
+            try {
+                let result = await convert(arr, file.value?.type as keyof typeof fileEndings || "image/png", outputType.value);
 
-            console.log("ERGEBNIS", result)
-
-            startDownload(result, `converted.${fileEndings[outputType.value]}`)
+                if (result && result.length) startDownload(result, `converted.${fileEndings[outputType.value]}`)
+            } catch (e) {
+                alert(e)
+            }
         }
+
         reader.readAsArrayBuffer(file.value)
     }
+}
+
+const convert = (arr: Uint8Array, inputType: keyof typeof fileEndings, outputType: keyof typeof fileEndings): Promise<Uint8Array> => {
+    return new Promise(async (resolve, reject) => {
+        const params: {
+            inputFile: Uint8Array;
+            inputType: string;
+            outputType: string;
+        } = {
+            inputFile: arr,
+            inputType: inputType,
+            outputType: outputType,
+        }
+
+        const { data, post, terminate } = useWebWorker(new MyWorker)
+
+        post(params);
+
+        await until(data).changed();
+
+        terminate();
+
+        if (data.value) {
+            resolve(data.value)
+        } else {
+            reject("Error converting file")
+        }
+    })
 }
 </script>
 
@@ -50,7 +77,7 @@ const convert = async () => {
                     <option v-for="(imageType, ending) in fileEndings" :value="ending">{{ imageType }}</option>
                 </InputsSelect>
             </div>
-            <InputsButton @click="convert">Start Conversion</InputsButton>
+            <InputsButton @click="startConversion">Start Conversion</InputsButton>
         </div>
     </div>
 </template>
