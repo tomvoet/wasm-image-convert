@@ -18,3 +18,7 @@ version = "0.3.61"
 features = [
     'Blob',
 ]
+
+[profile.release]
+lto = true
+opt-level = "s"

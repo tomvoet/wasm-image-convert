@@ -1,8 +1,8 @@
-use std::io::Cursor;
+use std::{fmt::Display, io::Cursor};
 
-use image::{ImageFormat, ImageOutputFormat};
+use image::{ImageError, ImageFormat, ImageOutputFormat};
 use js_sys::Uint8Array;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, throw_str};
 
 #[wasm_bindgen]
 extern "C" {
@@ -10,7 +10,36 @@ extern "C" {
     fn log(s: &str);
 }
 
+#[derive(Debug)]
+enum ConvertError {
+    UnknownFileType(String),
+    LibError(ImageError),
+}
+
+impl Display for ConvertError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ConvertError::UnknownFileType(s) => write!(f, "Unknown file type: {}", s),
+            ConvertError::LibError(e) => write!(f, "Image library error: {}", e),
+        }
+    }
+}
+
+impl From<image::ImageError> for ConvertError {
+    fn from(e: image::ImageError) -> Self {
+        ConvertError::LibError(e)
+    }
+}
+
+impl From<&str> for ConvertError {
+    fn from(e: &str) -> Self {
+        ConvertError::UnknownFileType(e.to_owned())
+    }
+}
+
+#[derive(Default)]
 enum FileType {
+    #[default]
     PNG,
     JPEG,
     GIF,
@@ -63,6 +92,32 @@ impl FileType {
     }
 }
 
+fn load_image(
+    file: &[u8],
+    file_type: Option<FileType>,
+) -> Result<image::DynamicImage, ConvertError> {
+    let load = match file_type {
+        Some(file_type) => image::load_from_memory_with_format(file, file_type.to_image_format())?,
+        None => image::load_from_memory(file)
+            .map_err(|e| ConvertError::UnknownFileType(e.to_string()))?,
+    };
+
+    Ok(load)
+}
+
+fn write_image(
+    img: &image::DynamicImage,
+    file_type: Option<FileType>,
+) -> Result<Vec<u8>, ConvertError> {
+    let mut output: Vec<u8> = Vec::new();
+
+    let target_type = file_type.unwrap_or_default().to_image_output_format();
+
+    img.write_to(&mut Cursor::new(&mut output), target_type)?;
+
+    Ok(output)
+}
+
 #[wasm_bindgen]
 pub fn convert_image(
     file: &Uint8Array,
@@ -72,36 +127,15 @@ pub fn convert_image(
 ) -> Uint8Array {
     let file = file.to_vec();
 
-    let load = match FileType::from_mime_type(src_type) {
-        Some(file_type) => image::load_from_memory_with_format(&file, file_type.to_image_format()),
-        None => {
-            log("Unknown source type");
-            image::load_from_memory(&file)
-        }
+    let img = match load_image(&file, FileType::from_mime_type(src_type)) {
+        Ok(img) => img,
+        Err(e) => throw_str(e.to_string().as_str()),
     };
 
-    let img = load.unwrap();
-
-    log(&format!("img: {:?}", img));
-
-    let (width, height) = (img.width(), img.height());
-
-    log(&format!("width: {}, height: {}", width, height));
-
-    let mut output: Vec<u8> = Vec::new();
-
-    //let this = JsValue::null();
-    ////cb.call1(&this, &JsValue::from_str(String::new("Hallooo")));
-    //cb.call1(&this, &JsValue::from_str(&("testtaaaa".to_owned())))
-    //    .unwrap();
-
-    let target_type = match FileType::from_mime_type(target_type) {
-        Some(file_type) => file_type.to_image_output_format(),
-        None => FileType::PNG.to_image_output_format(),
+    let output = match write_image(&img, FileType::from_mime_type(target_type)) {
+        Ok(output) => output,
+        Err(e) => throw_str(e.to_string().as_str()),
     };
-
-    img.write_to(&mut Cursor::new(&mut output), target_type)
-        .unwrap();
 
     Uint8Array::from(output.as_slice())
 }

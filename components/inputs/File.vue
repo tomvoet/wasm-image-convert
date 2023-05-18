@@ -6,8 +6,6 @@ const props = defineProps<{
 const data = useVModel(props, 'modelValue')
 
 const setFile = (file: File[] | null | FileList) => {
-    console.log("setFile")
-
     if (file) {
         data.value = file[0]
     }

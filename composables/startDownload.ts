@@ -1,6 +1,4 @@
 export default function startDownload(file: Uint8Array, filename: string) {
-  console.log("startDownload");
-
   const blob = new Blob([file], { type: "application/octet-stream" });
 
   const url = URL.createObjectURL(blob);
@@ -10,6 +8,4 @@ export default function startDownload(file: Uint8Array, filename: string) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-
-  console.log("startDownload done");
 }

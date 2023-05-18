@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MyWorker from "@/workers/convert.ts?worker"
 //https://github.com/eliaSchenker/nuxt-webworker/blob/main/plugins/sw.ts
+import { WorkerResponse, WorkerRequest } from "@/workers/convert.d"
 
 const file = ref<File | null>(null)
 
@@ -26,9 +27,17 @@ const startConversion = async () => {
             const arr = new Uint8Array(res)
 
             try {
+                const startTime = performance.now()
+
                 let result = await convert(arr, file.value?.type as keyof typeof fileEndings || "image/png", outputType.value);
 
                 if (result && result.length) startDownload(result, `converted.${fileEndings[outputType.value]}`)
+
+                const endTime = performance.now()
+
+                console.log(`Conversion took ${endTime - startTime}ms`)
+
+                // display with nuxt-crumb
             } catch (e) {
                 alert(e)
             }
@@ -40,11 +49,7 @@ const startConversion = async () => {
 
 const convert = (arr: Uint8Array, inputType: keyof typeof fileEndings, outputType: keyof typeof fileEndings): Promise<Uint8Array> => {
     return new Promise(async (resolve, reject) => {
-        const params: {
-            inputFile: Uint8Array;
-            inputType: string;
-            outputType: string;
-        } = {
+        const params: WorkerRequest = {
             inputFile: arr,
             inputType: inputType,
             outputType: outputType,
@@ -58,10 +63,12 @@ const convert = (arr: Uint8Array, inputType: keyof typeof fileEndings, outputTyp
 
         terminate();
 
-        if (data.value) {
-            resolve(data.value)
+        let res = data as Ref<WorkerResponse>
+
+        if (res.value.success) {
+            resolve(res.value.data as Uint8Array)
         } else {
-            reject("Error converting file")
+            reject(res.value.error)
         }
     })
 }
