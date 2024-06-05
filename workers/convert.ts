@@ -1,42 +1,50 @@
-import init, { convert_image } from "@/wasm/pkg";
-import { WorkerRequest, WorkerResponse } from "./convert.d";
+import { type WorkerMessage, WorkerMessageType, type WorkerRequest, type WorkerResponse } from './convert.d'
+import init, { convert_image } from '@/wasm/pkg'
 
-self.addEventListener(
-  "message",
-  async function (e: MessageEvent<WorkerRequest>) {
-    await init();
-
-    //const res = convert_image(
-    //  e.data.inputFile,
-    //  e.data.inputType,
-    //  e.data.outputType
-    //)
-    //
-    //console.log("b");
-    //
-    //self.postMessage(res);
+globalThis.addEventListener(
+  'message',
+  async (e: MessageEvent<WorkerRequest>) => {
+    await init()
 
     try {
       const res = convert_image(
         e.data.inputFile,
         e.data.inputType,
-        e.data.outputType
-      );
+        e.data.outputType,
+        callback,
+      )
 
-      let response: WorkerResponse = {
+      const response: WorkerResponse = {
         success: true,
         data: res,
-      };
+      }
 
-      self.postMessage(response);
-    } catch (e) {
-      let response: WorkerResponse = {
+      globalThis.postMessage({
+        type: WorkerMessageType.DONE,
+        payload: response,
+      } as WorkerMessage)
+    }
+    catch (e) {
+      const response: WorkerResponse = {
         success: false,
         error: String(e),
-      };
+      }
 
-      self.postMessage(response);
+      globalThis.postMessage({
+        type: WorkerMessageType.ERROR,
+        payload: response,
+      })
     }
   },
-  false
-);
+  false,
+)
+
+function callback(progress: number, message: string) {
+  globalThis.postMessage({
+    type: WorkerMessageType.PROGRESS,
+    payload: {
+      progress,
+      message,
+    },
+  } as WorkerMessage)
+}

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 useServerSeoMeta({
-  title: "Wasm File Converter",
-  description: "Convert different file formats with this free and easy to use app. The app is also very fast and private due to client-side conversions using WebAssembly (WASM). Try it out today!🚀",
+  title: 'Wasm File Converter',
+  description: 'Convert different file formats with this free and easy to use app. The app is also very fast and private due to client-side conversions using WebAssembly (WASM). Try it out today!🚀',
 })
 </script>
 
@@ -16,5 +16,6 @@ useServerSeoMeta({
     <main class="grid place-items-center">
       <Converter />
     </main>
+    <UNotifications />
   </div>
 </template>
