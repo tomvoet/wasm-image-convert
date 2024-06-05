@@ -51,7 +51,7 @@ fn process_image(
     }
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = convertImage)]
 /// Convert an image from one format to another.
 pub fn convert_image(
     file: &Uint8Array,

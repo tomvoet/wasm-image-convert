@@ -1,5 +1,5 @@
 import { type WorkerMessage, WorkerMessageType, type WorkerRequest, type WorkerResponse } from './convert.d'
-import init, { convert_image } from '@/wasm/pkg'
+import init, { convertImage } from '@/wasm/pkg'
 
 globalThis.addEventListener(
   'message',
@@ -7,7 +7,7 @@ globalThis.addEventListener(
     await init()
 
     try {
-      const res = convert_image(
+      const res = convertImage(
         e.data.inputFile,
         e.data.inputType,
         e.data.outputType,
