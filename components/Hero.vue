@@ -23,17 +23,10 @@
         Wasm File Converter
       </h1>
       <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
-        Introducing
-        the
-        <b class="dark:text-white text-black">WASM File Converter App!</b> This app is designed to convert different
-        file formats
-        and
-        it's free and easy to
-        use.
-        The app is also very fast and private due to client-side conversions using WebAssembly (WASM). <b
-          class="dark:text-white text-black"
-        > Try it out
-          today!🚀</b>
+        Meet the
+        <b class="dark:text-white text-black">WASM File Converter!</b> Convert your files quickly and securely with our free,
+        easy-to-use app. Powered by WebAssembly (WASM), it ensures fast, private client-side conversions.
+        <b class="dark:text-white text-black">Give it a try today! 🚀</b>
       </p>
     </div>
   </section>
