@@ -5,6 +5,7 @@
     "name": "Tom Voet",
     "email": "tomvoet@pm.me"
   },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/tomvoet/wasm-convert"
