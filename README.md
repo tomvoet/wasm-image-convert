@@ -54,7 +54,7 @@ To get a local copy up and running, follow these simple steps.
     pnpm dev
     ```
 
-5. Open your browser and navigate to `http://localhost:3000`.
+5. Open your browser and navigate to `http://localhost:3000/wasm-convert/`.
 
 ## Usage
 
