@@ -7,8 +7,8 @@ pub enum ConvertError {
     UnknownFileType(String),
     #[error("Image library error: {0}")]
     LibError(#[from] ImageError),
-    //#[error("Parsing error: {0}")]
-    //serde
+    #[error("Parsing error: {0}")]
+    ParseError(#[from] serde_json::Error),
     #[error("SVG error: {0}")]
     SvgError(#[from] SvgError),
     #[error("Encoding error: {0}")]

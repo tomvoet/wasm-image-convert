@@ -7,7 +7,7 @@ use js_sys::Uint8Array;
 use settings::{Settings, SvgSettings};
 use source_type::SourceType;
 use svg::svg_to_png;
-use wasm_bindgen::{prelude::*, throw_str};
+use wasm_bindgen::prelude::*;
 
 mod error;
 mod settings;
@@ -24,13 +24,12 @@ fn load_image(
             image::load_from_memory_with_format(file, file_type)?
         }
         Some(SourceType::Svg) => {
-            if let Some(Settings::Svg(svg_settings)) = config {
-                let img = svg_to_png(file, svg_settings)?;
-                image::load_from_memory_with_format(&img, ImageFormat::Png)?
-            } else {
-                let img = svg_to_png(file, SvgSettings::default())?;
-                image::load_from_memory_with_format(&img, ImageFormat::Png)?
-            }
+            let svg_settings = match config {
+                Some(Settings::Svg(settings)) => settings,
+                _ => SvgSettings::default(),
+            };
+            let img = svg_to_png(file, svg_settings)?;
+            image::load_from_memory_with_format(&img, ImageFormat::Png)?
         }
         None => image::load_from_memory(file)
             .map_err(|e| ConvertError::UnknownFileType(e.to_string()))?,
@@ -67,18 +66,25 @@ fn process_image(
 
 #[wasm_bindgen(js_name = convertImage)]
 /// Convert an image from one format to another.
+/// # Arguments
+/// * `file` - The image file to convert.
+/// * `src_type` - The MIME type of the source image.
+/// * `target_type` - The MIME type of the target image.
+/// * `cb` - A callback function to report progress.
+/// * `convert_settings` - Settings for the conversion.
 pub fn convert_image(
     file: &Uint8Array,
     src_type: &str,
     target_type: &str,
     cb: &js_sys::Function,
     convert_settings: &JsValue,
-) -> Uint8Array {
-    let convert_settings = if convert_settings.is_undefined() || convert_settings.is_null() {
-        None
-    } else {
-        Some(convert_settings.into_serde::<Settings>().unwrap())
-    };
+) -> Result<Uint8Array, JsValue> {
+    let convert_settings = convert_settings
+        .into_serde::<Option<Settings>>()
+        .map_err(|e| {
+            let e = ConvertError::ParseError(e);
+            JsValue::from_str(e.to_string().as_str())
+        })?;
 
     let this = JsValue::NULL;
 
@@ -87,6 +93,7 @@ pub fn convert_image(
         &JsValue::from_f64(10.0),
         &JsValue::from_str("Starting conversion"),
     );
+
     let file = file.to_vec();
 
     let _ = cb.call2(
@@ -95,14 +102,12 @@ pub fn convert_image(
         &JsValue::from_str("Loading image"),
     );
 
-    let img = match load_image(
+    let img = load_image(
         &file,
         SourceType::from_mime_type(src_type),
         convert_settings,
-    ) {
-        Ok(img) => img,
-        Err(e) => throw_str(e.to_string().as_str()),
-    };
+    )
+    .map_err(|e| JsValue::from_str(e.to_string().as_str()))?;
 
     let _ = cb.call2(
         &this,
@@ -118,10 +123,8 @@ pub fn convert_image(
         &JsValue::from_str("Converting image"),
     );
 
-    let output = match write_image(&img, ImageFormat::from_mime_type(target_type)) {
-        Ok(output) => output,
-        Err(e) => throw_str(e.to_string().as_str()),
-    };
+    let output = write_image(&img, ImageFormat::from_mime_type(target_type))
+        .map_err(|e| JsValue::from_str(e.to_string().as_str()))?;
 
     let _ = cb.call2(
         &this,
@@ -129,5 +132,5 @@ pub fn convert_image(
         &JsValue::from_str("Conversion complete"),
     );
 
-    Uint8Array::from(output.as_slice())
+    Ok(Uint8Array::from(output.as_slice()))
 }
