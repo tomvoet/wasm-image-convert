@@ -12,8 +12,16 @@ description = "Convert images in the browser using WebAssembly"
 crate-type = ["cdylib"]
 
 [dependencies]
+gloo-utils = { version = "0.2.0", features = ["serde"] }
 image = "0.25.1"
 js-sys = "0.3.61"
+resvg = { version = "0.42.0", default-features = false, features = [
+    "text",
+    "raster-images",
+] }
+serde = { version = "1.0.203", features = ["serde_derive"] }
+# serde = { version = "1.0.203", features = ["serde_derive"] }
+# serde_json = "1.0.117"
 thiserror = "1.0.61"
 wasm-bindgen = "0.2.84"
 

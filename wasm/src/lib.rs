@@ -1,23 +1,37 @@
 use std::io::Cursor;
 
-use image::{ImageError, ImageFormat};
+use error::ConvertError;
+use gloo_utils::format::JsValueSerdeExt;
+use image::ImageFormat;
 use js_sys::Uint8Array;
+use settings::{Settings, SvgSettings};
+use source_type::SourceType;
+use svg::svg_to_png;
 use wasm_bindgen::{prelude::*, throw_str};
 
-#[derive(thiserror::Error, Debug)]
-enum ConvertError {
-    #[error("Unknown file type: {0}")]
-    UnknownFileType(String),
-    #[error("Image library error: {0}")]
-    LibError(#[from] ImageError),
-}
+mod error;
+mod settings;
+mod source_type;
+mod svg;
 
 fn load_image(
     file: &[u8],
-    file_type: Option<ImageFormat>,
+    source_type: Option<SourceType>,
+    config: Option<Settings>,
 ) -> Result<image::DynamicImage, ConvertError> {
-    let load = match file_type {
-        Some(file_type) => image::load_from_memory_with_format(file, file_type)?,
+    let load = match source_type {
+        Some(SourceType::Raster(file_type)) => {
+            image::load_from_memory_with_format(file, file_type)?
+        }
+        Some(SourceType::Svg) => {
+            if let Some(Settings::Svg(svg_settings)) = config {
+                let img = svg_to_png(file, svg_settings)?;
+                image::load_from_memory_with_format(&img, ImageFormat::Png)?
+            } else {
+                let img = svg_to_png(file, SvgSettings::default())?;
+                image::load_from_memory_with_format(&img, ImageFormat::Png)?
+            }
+        }
         None => image::load_from_memory(file)
             .map_err(|e| ConvertError::UnknownFileType(e.to_string()))?,
     };
@@ -58,7 +72,14 @@ pub fn convert_image(
     src_type: &str,
     target_type: &str,
     cb: &js_sys::Function,
+    convert_settings: &JsValue,
 ) -> Uint8Array {
+    let convert_settings = if convert_settings.is_undefined() || convert_settings.is_null() {
+        None
+    } else {
+        Some(convert_settings.into_serde::<Settings>().unwrap())
+    };
+
     let this = JsValue::NULL;
 
     let _ = cb.call2(
@@ -74,7 +95,11 @@ pub fn convert_image(
         &JsValue::from_str("Loading image"),
     );
 
-    let img = match load_image(&file, ImageFormat::from_mime_type(src_type)) {
+    let img = match load_image(
+        &file,
+        SourceType::from_mime_type(src_type),
+        convert_settings,
+    ) {
         Ok(img) => img,
         Err(e) => throw_str(e.to_string().as_str()),
     };
