@@ -1,3 +1,5 @@
+import type { Settings } from '~/utils/settings'
+
 export enum WorkerMessageType {
   PROGRESS,
   DONE,
@@ -30,4 +32,5 @@ export interface WorkerRequest {
   inputFile: Uint8Array
   inputType: string
   outputType: string
+  settings?: Settings
 }
