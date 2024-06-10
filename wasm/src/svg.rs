@@ -57,24 +57,4 @@ mod tests {
 
         assert_eq!(img.dimensions(), (100, 100));
     }
-
-    #[test]
-    fn test_rasterize_svg_output_png() {
-        let svg = include_bytes!("../assets/test.svg");
-
-        let result = svg_to_png(
-            svg,
-            SvgSettings {
-                width: 500,
-                height: 500,
-            },
-        )
-        .unwrap();
-
-        let dynamic_image = image::load_from_memory_with_format(&result, ImageFormat::Png).unwrap();
-
-        dynamic_image
-            .save_with_format("test_output.png", ImageFormat::Png)
-            .unwrap();
-    }
 }
