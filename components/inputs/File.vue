@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { Dimensions, type SVGData } from '~/utils/dimensions'
+
 const props = defineProps<{
-  modelValue: File | undefined
+  file: File | undefined
+  svgData: SVGData | undefined
 }>()
 
-const data = useVModel(props, 'modelValue')
+const data = useVModel(props, 'file')
+const svgDataModel = useVModel(props, 'svgData')
 
 function setFile(file: File[] | null | FileList) {
   if (file) {
@@ -23,12 +27,43 @@ const dropZoneRef = ref<HTMLDivElement | null>()
 
 const { isOverDropZone } = useDropZone(dropZoneRef, setFile)
 
-const imgBase64 = computed(() => {
+const imgSource = computed(() => {
   if (data.value) {
     return URL.createObjectURL(data.value)
   }
   else {
     return undefined
+  }
+})
+
+watch(data, () => {
+  if (data.value && data.value.type === 'image/svg+xml') {
+    const reader = new FileReader()
+
+    reader.onloadend = (e) => {
+      const res = e.target?.result as string
+
+      const parser = new DOMParser()
+
+      const doc = parser.parseFromString(res, 'image/svg+xml')
+
+      const svg = doc.querySelector('svg')
+
+      if (svg) {
+        const viewBox = svg.getAttribute('viewBox')
+
+        if (viewBox) {
+          // aspectRatioModel.value = Dimensions.fromSVGViewBox(viewBox)
+          const dimensions = Dimensions.fromSVGViewBox(viewBox)
+          svgDataModel.value = dimensions.getSVGData()
+        }
+      }
+    }
+
+    reader.readAsText(data.value)
+  }
+  else {
+    svgDataModel.value = undefined
   }
 })
 </script>
@@ -61,17 +96,17 @@ const imgBase64 = computed(() => {
           <p class="text-xs text-gray-500 dark:text-gray-400">Any image file (i.e. png, jpg, jpeg, gif, webp etc.)</p>
         </template>
         <div v-else class="grid place-items-center">
-          <div class="relative group">
+          <div class="relative group" @click.capture.prevent="data = undefined">
             <div
               class="absolute text-white inset-0 hidden group-hover:grid place-items-center backdrop-brightness-50"
             >
-              <button @click.prevent="data = undefined">Remove file</button>
+              <span>Remove file</span>
             </div>
-            <img :src="imgBase64 || ''" class=" object-scale-down max-h-56 max-w-xl">
+            <img :src="imgSource || ''" class=" object-scale-down max-h-56 max-w-xl min-h-24 min-w-24">
           </div>
         </div>
       </div>
-      <input id="file-dropzone" type="file" class="hidden" multiple="false" @change="onUpdate">
+      <input id="file-dropzone" type="file" accept="image/*" class="hidden" multiple="false" @change="onUpdate">
     </label>
   </div>
 </template>

@@ -12,6 +12,7 @@ globalThis.addEventListener(
         e.data.inputType,
         e.data.outputType,
         callback,
+        e.data.settings,
       )
 
       const response: WorkerResponse = {

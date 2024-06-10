@@ -8,7 +8,7 @@
       >
         <span class="text-xs bg-primary-600 rounded-full text-white px-4 py-1.5 mr-3">New</span> <span
           class="text-sm font-medium"
-        >Added more file types to image conversion</span>
+        >SVG conversion support added</span>
         <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
           <path
             fill-rule="evenodd"
