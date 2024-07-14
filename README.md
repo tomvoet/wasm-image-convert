@@ -1,6 +1,6 @@
-# WASM File Converter
+# WASM Image Converter
 
-Welcome to the **WASM File Converter** repository! This project is designed to convert different file formats quickly and securely using WebAssembly (WASM). The app is built with TypeScript, Vue, Nuxt, and Rust, utilizing the `image-rs` library for image processing.
+Welcome to the **WASM Image Converter** repository! This project is designed to convert different file formats quickly and securely using WebAssembly (WASM). The app is built with TypeScript, Vue, Nuxt, and Rust, utilizing the `image-rs` library for image processing.
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ To get a local copy up and running, follow these simple steps.
 
 1. **Clone the repository**:
     ```sh
-    git clone https://github.com/tomvoet/wasm-convert.git
+    git clone https://github.com/tomvoet/wasm-image-convert.git
     cd wasm-convert
     ```
 
@@ -54,7 +54,7 @@ To get a local copy up and running, follow these simple steps.
     pnpm dev
     ```
 
-5. Open your browser and navigate to `http://localhost:3000/wasm-convert/`.
+5. Open your browser and navigate to `http://localhost:3000/wasm-image-convert/`.
 
 ## Usage
 
