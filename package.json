@@ -23,12 +23,12 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.20.0",
-    "@nuxt/eslint": "^0.3.13",
-    "@nuxt/ui": "^2.16.0",
-    "@vueuse/nuxt": "^10.10.0",
-    "eslint": "^9.4.0",
-    "eslint-plugin-format": "^0.1.1",
-    "gh-pages": "^5.0.0",
-    "nuxt": "^3.11.2"
+    "@nuxt/eslint": "0.5.0",
+    "@nuxt/ui": "2.18.4",
+    "@vueuse/nuxt": "10.11.0",
+    "eslint": "9.8.0",
+    "eslint-plugin-format": "0.1.2",
+    "gh-pages": "6.1.1",
+    "nuxt": "^3.12.4"
   }
 }

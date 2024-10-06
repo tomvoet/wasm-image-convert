@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Dimensions, type SVGData } from '~/utils/dimensions'
+import { acceptList } from '~/utils/file_types'
 
 const props = defineProps<{
   file: File | undefined
@@ -97,16 +98,14 @@ watch(data, () => {
         </template>
         <div v-else class="grid place-items-center">
           <div class="relative group" @click.capture.prevent="data = undefined">
-            <div
-              class="absolute text-white inset-0 hidden group-hover:grid place-items-center backdrop-brightness-50"
-            >
+            <div class="absolute text-white inset-0 hidden group-hover:grid place-items-center backdrop-brightness-50">
               <span>Remove file</span>
             </div>
             <img :src="imgSource || ''" class=" object-scale-down max-h-56 max-w-xl min-h-24 min-w-24">
           </div>
         </div>
       </div>
-      <input id="file-dropzone" type="file" accept="image/*" class="hidden" multiple="false" @change="onUpdate">
+      <input id="file-dropzone" type="file" :accept="acceptList" class="hidden" multiple="false" @change="onUpdate">
     </label>
   </div>
 </template>
