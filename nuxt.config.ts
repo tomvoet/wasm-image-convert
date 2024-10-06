@@ -19,6 +19,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-10-05',
 
   future: {
-    compatibilityVersion: 4
-  }
+    compatibilityVersion: 4,
+  },
+
+  icon: {
+    clientBundle: {
+      icons: ['simple-icons:github', 'heroicons:moon-20-solid', 'heroicons:sun-20-solid'],
+    },
+  },
 })

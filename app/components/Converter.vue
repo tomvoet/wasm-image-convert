@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { outputFileEndings } from '#imports'
 import ConversionWorker from '@/workers/convert.ts?worker'
 // https://github.com/eliaSchenker/nuxt-webworker/blob/main/plugins/sw.ts
 import { type WorkerMessage, WorkerMessageType, type WorkerProgress, type WorkerRequest } from '@/workers/convert.d'
 import type { SVGData } from '~/utils/dimensions'
 import type { SvgSettings } from '~/utils/settings'
-import { outputFileEndings } from '#imports'
 
 const toast = useToast()
 
@@ -49,8 +49,6 @@ async function startConversion() {
   if (file.value) {
     const reader = new FileReader()
 
-    console.log(file.value)
-
     reader.onloadend = async (e) => {
       const res = e.target?.result as ArrayBuffer
 
@@ -68,8 +66,6 @@ async function startConversion() {
 
           return
         }
-
-        console.log(getMimeType(file.value))
 
         const result = await convert(arr, getMimeType(file.value), outputType.value)
 

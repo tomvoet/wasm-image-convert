@@ -26,7 +26,12 @@ export const acceptList = [
   '.ff',
   // HDR
   '.hdr',
-  //
+  // QOI
+  '.qoi',
+  // TGA
+  '.tga',
+  // PNM
+  '.pnm',
 ].join(',')
 
 export type MimeTypes = keyof typeof outputFileEndings | keyof typeof inputFileEndings | 'application/octet-stream'
@@ -35,13 +40,9 @@ export function getMimeType(file: File): MimeTypes {
   if (file.type === '') {
     const extension = file.name.split('.').pop()
 
-    console.log('extension', extension)
-    console.log(Object.entries(inputFileEndings))
-
-    if (extension) {
+    if (extension !== undefined) {
       Object.entries(inputFileEndings).forEach(([mimeType, ext]) => {
         if (ext === extension) {
-          console.log('mimeType', mimeType)
           return mimeType
         }
       })

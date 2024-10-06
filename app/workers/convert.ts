@@ -1,8 +1,9 @@
-import { type WorkerMessage, WorkerMessageType, type WorkerRequest, type WorkerResponse } from './convert.d'
 import init, { convertImage } from '@@/wasm/pkg'
+import { type WorkerMessage, WorkerMessageType, type WorkerRequest, type WorkerResponse } from './convert.d'
 
 globalThis.addEventListener(
   'message',
+  /*
   async (e: MessageEvent<WorkerRequest>) => {
     await init()
 
@@ -36,6 +37,34 @@ globalThis.addEventListener(
         payload: response,
       })
     }
+  },
+  */
+  (e: MessageEvent<WorkerRequest>) => {
+    init().then(() => {
+      const { inputFile, inputType, outputType, settings } = e.data
+
+      const res = convertImage(inputFile, inputType, outputType, callback, settings)
+
+      const response: WorkerResponse = {
+        success: true,
+        data: res,
+      }
+
+      globalThis.postMessage({
+        type: WorkerMessageType.DONE,
+        payload: response,
+      } as WorkerMessage)
+    }).catch((e) => {
+      const response: WorkerResponse = {
+        success: false,
+        error: String(e),
+      }
+
+      globalThis.postMessage({
+        type: WorkerMessageType.ERROR,
+        payload: response,
+      })
+    })
   },
   false,
 )

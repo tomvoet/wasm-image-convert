@@ -9,17 +9,17 @@ description = "Convert images in the browser using WebAssembly"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = [ "cdylib" ]
 
 [dependencies]
-gloo-utils = { version = "0.2.0", features = ["serde"] }
+gloo-utils = { version = "0.2.0", features = [ "serde" ] }
 image = "0.25.1"
 js-sys = "0.3.61"
 resvg = { version = "0.42.0", default-features = false, features = [
-    "text",
-    "raster-images",
+  "text",
+  "raster-images",
 ] }
-serde = { version = "1.0.203", features = ["serde_derive"] }
+serde = { version = "1.0.203", features = [ "serde_derive" ] }
 serde_json = { version = "1.0.117", default-features = false }
 # serde = { version = "1.0.203", features = ["serde_derive"] }
 # serde_json = "1.0.117"
@@ -28,7 +28,7 @@ wasm-bindgen = "0.2.84"
 
 [dependencies.web-sys]
 version = "0.3.61"
-features = ['Blob']
+features = [ 'Blob' ]
 
 [profile.release]
 lto = true

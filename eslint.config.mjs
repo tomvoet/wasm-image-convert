@@ -1,7 +1,12 @@
 // @ts-check
 import antfu from '@antfu/eslint-config'
-import withNuxt from '.nuxt/eslint.config.mjs'
 
-export default withNuxt(antfu({
+export default antfu({
   ignores: ['wasm/pkg/*'],
-}))
+  typescript: {
+    tsconfigPath: './tsconfig.json',
+  },
+  rules: {
+    'antfu/top-level-function': 'off',
+  },
+})
