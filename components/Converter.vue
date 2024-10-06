@@ -4,6 +4,7 @@ import ConversionWorker from '@/workers/convert.ts?worker'
 import { type WorkerMessage, WorkerMessageType, type WorkerProgress, type WorkerRequest } from '@/workers/convert.d'
 import type { SVGData } from '~/utils/dimensions'
 import type { SvgSettings } from '~/utils/settings'
+import { outputFileEndings } from '#imports'
 
 const toast = useToast()
 
@@ -48,6 +49,8 @@ async function startConversion() {
   if (file.value) {
     const reader = new FileReader()
 
+    console.log(file.value)
+
     reader.onloadend = async (e) => {
       const res = e.target?.result as ArrayBuffer
 
@@ -56,7 +59,19 @@ async function startConversion() {
       try {
         const startTime = performance.now()
 
-        const result = await convert(arr, file.value?.type as keyof typeof inputFileEndings || 'image/png', outputType.value)
+        if (!file.value) {
+          toast.add({
+            title: 'Error',
+            icon: 'i-heroicons-exclamation-circle',
+            description: 'No file selected',
+          })
+
+          return
+        }
+
+        console.log(getMimeType(file.value))
+
+        const result = await convert(arr, getMimeType(file.value), outputType.value)
 
         if (result && result.length)
           startDownload(result, `converted.${inputFileEndings[outputType.value]}`)
@@ -93,7 +108,7 @@ async function startConversion() {
   }
 }
 
-function convert(arr: Uint8Array, inputType: keyof typeof inputFileEndings, outputType: keyof typeof outputFileEndings): Promise<Uint8Array> {
+function convert(arr: Uint8Array, inputType: MimeTypes, outputType: keyof typeof outputFileEndings): Promise<Uint8Array> {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     const params: WorkerRequest = {
@@ -120,7 +135,8 @@ function convert(arr: Uint8Array, inputType: keyof typeof inputFileEndings, outp
       try {
         await until(data).changed({ timeout: 1000 })
       }
-      catch (e) {
+      // eslint-disable-next-line unused-imports/no-unused-vars
+      catch (_e) {
         reject(new Error('Conversion timed out'))
       }
 
@@ -158,14 +174,8 @@ watch(file, () => {
     </InputsFile>
     <div class="flex flex-row items-end space-x-10 pt-3">
       <div class="grow">
-        <InputsSelect
-          v-model="outputType" name="outputType" placeholder="Select a File Type"
-          label="Output File Type"
-        >
-          <option
-            v-for="(imageType, ending) in outputFileEndings"
-            :key="ending" :value="ending"
-          >
+        <InputsSelect v-model="outputType" name="outputType" placeholder="Select a File Type" label="Output File Type">
+          <option v-for="(imageType, ending) in outputFileEndings" :key="ending" :value="ending">
             {{ imageType }}
           </option>
         </InputsSelect>
@@ -174,7 +184,12 @@ watch(file, () => {
         Start Conversion
       </InputsButton>
     </div>
-    <UAlert v-if="warning" variant="soft" color="yellow" :title="warning.title" :icon="warning.icon" :description="warning.description" :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }" class="mt-6" @close="warning = undefined" />
+    <UAlert
+      v-if="warning" variant="soft" color="yellow" :title="warning.title" :icon="warning.icon"
+      :description="warning.description"
+      :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
+      class="mt-6" @close="warning = undefined"
+    />
     <div
       v-if="svgData !== undefined && size !== undefined"
       class="mt-6 block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 w-full"
@@ -183,8 +198,7 @@ watch(file, () => {
         SVG Settings
       </h5>
       <InputsSize
-        v-model:size="size"
-        :aspect-ratio="svgData ? svgData.aspectRatio : 2"
+        v-model:size="size" :aspect-ratio="svgData ? svgData.aspectRatio : 2"
         :source-dimensions="[svgData ? svgData.width : 0, svgData ? svgData.height : 0]"
       />
     </div>

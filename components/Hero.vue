@@ -20,11 +20,11 @@
       <h1
         class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
       >
-        Wasm File Converter
+        Wasm Image Converter
       </h1>
       <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
         Meet the
-        <b class="dark:text-white text-black">WASM File Converter!</b> Convert your files quickly and securely with our free,
+        <b class="dark:text-white text-black">WASM Image Converter!</b> Convert your images quickly and securely with our free,
         easy-to-use app. Powered by WebAssembly (WASM), it ensures fast, private client-side conversions.
         <b class="dark:text-white text-black">Give it a try today! 🚀</b>
       </p>
