@@ -51,15 +51,27 @@ fn write_image(
     Ok(output)
 }
 
+/// Image pre-processing, to ensure that the image can be converted to the target format.
 fn process_image(
     img: image::DynamicImage,
+    source_type: Option<ImageFormat>,
     target_type: Option<ImageFormat>,
 ) -> image::DynamicImage {
     let target_type = target_type.unwrap_or(ImageFormat::Png);
 
+    let img = match source_type {
+        Some(ImageFormat::Hdr) => image::DynamicImage::ImageRgba8(img.to_rgba8()),
+        _ => img,
+    };
+
     match target_type {
-        ImageFormat::Jpeg => image::DynamicImage::ImageRgb8(img.to_rgb8()),
+        ImageFormat::Jpeg
+        | ImageFormat::Qoi
+        | ImageFormat::Farbfeld
+        | ImageFormat::Pnm
+        | ImageFormat::Tga => image::DynamicImage::ImageRgb8(img.to_rgb8()),
         ImageFormat::Ico => img.resize(256, 256, image::imageops::FilterType::Lanczos3),
+        ImageFormat::OpenExr => image::DynamicImage::ImageRgba32F(img.to_rgba32f()),
         _ => img,
     }
 }
@@ -115,7 +127,11 @@ pub fn convert_image(
         &JsValue::from_str("Processing image"),
     );
 
-    let img = process_image(img, ImageFormat::from_mime_type(target_type));
+    let img = process_image(
+        img,
+        ImageFormat::from_mime_type(src_type),
+        ImageFormat::from_mime_type(target_type),
+    );
 
     let _ = cb.call2(
         &this,
