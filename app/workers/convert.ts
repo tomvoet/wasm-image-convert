@@ -1,5 +1,5 @@
 import { type WorkerMessage, WorkerMessageType, type WorkerRequest, type WorkerResponse } from './convert.d'
-import init, { convertImage } from '@/wasm/pkg'
+import init, { convertImage } from '@@/wasm/pkg'
 
 globalThis.addEventListener(
   'message',
