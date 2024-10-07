@@ -13,6 +13,8 @@ const svgData = ref<SVGData>()
 
 const size = ref<[number, number]>()
 
+const modalOpen = ref(false)
+
 watch(svgData, (newData) => {
   if (newData) {
     size.value = [newData.width, newData.height]
@@ -165,6 +167,27 @@ watch(file, () => {
 
 <template>
   <div class="w-3/4 max-w-2xl">
+    <div class="flex flex-row justify-end">
+      <button class="text-xs underline text-gray-500 dark:text-gray-400 cursor-pointer mb-1 hover:text-gray-700 dark:hover:text-gray-300" @click="modalOpen = true">
+        Supported File formats
+      </button>
+      <UModal v-model="modalOpen">
+        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                Supported File formats
+              </h3>
+              <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="modalOpen = false" />
+            </div>
+          </template>
+          Largely based on the file formats supported by <ULink href="https://github.com/image-rs/image?tab=readme-ov-file#supported-image-formats" target="_blank" class="underline">
+            image-rs
+          </ULink>
+          <UTable :rows="supportedFormats" />
+        </UCard>
+      </UModal>
+    </div>
     <InputsFile v-model:file="file" v-model:svg-data="svgData">
       Choose File
     </InputsFile>

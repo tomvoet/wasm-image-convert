@@ -53,3 +53,26 @@ export function getMimeType(file: File): MimeTypes {
 
   return file.type as keyof typeof outputFileEndings
 }
+
+/**
+ * Supported formats and their capabilities.
+ * See https://github.com/image-rs/image?tab=readme-ov-file#supported-image-formats for more information.
+ */
+export const supportedFormats = [
+  { format: 'AVIF', decoding: 'No', encoding: 'Yes (lossy only)' },
+  { format: 'BMP', decoding: 'Yes', encoding: 'Yes' },
+  /* { format: 'DDS', decoding: 'Yes', encoding: '---' }, */
+  { format: 'Farbfeld', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'GIF', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'HDR', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'ICO', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'JPEG', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'EXR', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'PNG', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'PNM', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'QOI', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'TGA', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'TIFF', decoding: 'Yes', encoding: 'Yes' },
+  { format: 'WebP', decoding: 'Yes', encoding: 'Yes (lossless only)' },
+  { format: 'SVG', decoding: 'Yes', encoding: 'No' },
+]
