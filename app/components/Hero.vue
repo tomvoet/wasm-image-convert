@@ -1,3 +1,9 @@
+<script setup lang="ts">
+const hideHeroText = useCookie<boolean>('hideHeroText', {
+  default: () => false,
+})
+</script>
+
 <template>
   <section>
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
@@ -22,7 +28,7 @@
       >
         Wasm Image Converter
       </h1>
-      <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
+      <p v-if="!hideHeroText" class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
         Meet the
         <b class="dark:text-white text-black">WASM Image Converter!</b> Convert your images quickly and securely with our free,
         easy-to-use app. Powered by WebAssembly (WASM), it ensures fast, private client-side conversions.
